@@ -1,8 +1,12 @@
-import cors from 'cors';
-import express from 'express';
+import Fastify from 'fastify';
 
-export const app = express();
+const app = Fastify({
+  logger: true,
+});
 
-app.use(cors());
+// Routes
+app.get('/', async function handler(_request, _reply) {
+  return "To-don't list";
+});
 
-app.use(express.json());
+export default app;
