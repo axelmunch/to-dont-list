@@ -15,3 +15,26 @@ export interface TagType {
   name: string;
   priority: priority;
 }
+
+const maxNameSize = 50;
+
+export function validateTag(task: TagType): boolean {
+  // Name
+  if (typeof task.name !== 'undefined') {
+    if (typeof task.name !== 'string' || task.name.length > maxNameSize) {
+      return false;
+    }
+  }
+
+  // Priority
+  if (typeof task.priority !== 'undefined') {
+    if (
+      typeof task.priority !== 'string' ||
+      !Object.values(priority).includes(task.priority)
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}

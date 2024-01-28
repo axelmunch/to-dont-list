@@ -1,6 +1,6 @@
 import database from './database.js';
-import { Tag, type TagType } from './Tag.js';
-import { Task, type TaskType } from './Task.js';
+import { Tag, validateTag, type TagType } from './Tag.js';
+import { Task, validateTask, type TaskType } from './Task.js';
 
 interface EntityTypes {
   id: number;
@@ -12,5 +12,5 @@ interface EntityTypes {
 Tag.belongsToMany(Task, { through: 'TaskTag', onDelete: 'CASCADE' });
 Task.belongsToMany(Tag, { through: 'TaskTag', onDelete: 'CASCADE' });
 
-export { database, Tag, Task };
+export { database, Tag, validateTag, Task, validateTask };
 export type { EntityTypes, TagType, TaskType };
