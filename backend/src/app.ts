@@ -1,12 +1,13 @@
 import Fastify from 'fastify';
+import routes from './routes/index.js';
 
 const app = Fastify({
   logger: true,
 });
 
 // Routes
-app.get('/', async function handler(_request, _reply) {
-  return "To-don't list";
+routes.forEach((route) => {
+  app.route(route);
 });
 
 export default app;
