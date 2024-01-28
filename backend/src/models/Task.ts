@@ -2,9 +2,9 @@ import { DataTypes } from 'sequelize';
 import database from './database.js';
 import priority from './priority.js';
 
-const Task = database.define('Task', {
+export const Task = database.define('Task', {
   done: { type: DataTypes.BOOLEAN, defaultValue: false },
-  title: DataTypes.STRING,
+  title: { type: DataTypes.STRING, allowNull: false },
   content: { type: DataTypes.TEXT, allowNull: true },
   deadline: { type: DataTypes.DATE, allowNull: true },
   priority: {
@@ -14,4 +14,10 @@ const Task = database.define('Task', {
   },
 });
 
-export default Task;
+export interface TaskType {
+  done?: boolean;
+  title: string;
+  content?: string;
+  deadline?: Date;
+  priority: priority;
+}

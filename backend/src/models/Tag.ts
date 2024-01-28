@@ -2,8 +2,8 @@ import { DataTypes } from 'sequelize';
 import database from './database.js';
 import priority from './priority.js';
 
-const Tag = database.define('Tag', {
-  name: DataTypes.STRING,
+export const Tag = database.define('Tag', {
+  name: { type: DataTypes.STRING, allowNull: false },
   priority: {
     type: DataTypes.ENUM,
     values: Object.values(priority),
@@ -11,4 +11,7 @@ const Tag = database.define('Tag', {
   },
 });
 
-export default Tag;
+export interface TagType {
+  name: string;
+  priority: priority;
+}
