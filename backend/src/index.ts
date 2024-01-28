@@ -1,6 +1,6 @@
 import { configDotenv } from 'dotenv';
 import app from './app.js';
-import database from './models/database.js';
+import { database } from './models/index.js';
 
 configDotenv();
 
