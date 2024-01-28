@@ -4,7 +4,7 @@ import app from './app.js';
 configDotenv();
 
 const PORT: number =
-  process.env.PORT != null ? parseInt(process.env.PORT) : 3000;
+  process.env.PORT != null ? parseInt(process.env.PORT) : 3001;
 
 app
   .listen({ port: PORT })
