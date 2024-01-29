@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import database from './database.js';
-import priority from './priority.js';
+import Priority from './Priority.js';
 
 export const Task = database.define('Task', {
   done: { type: DataTypes.BOOLEAN, defaultValue: false },
@@ -9,8 +9,8 @@ export const Task = database.define('Task', {
   deadline: { type: DataTypes.DATE, allowNull: true },
   priority: {
     type: DataTypes.ENUM,
-    values: Object.values(priority),
-    defaultValue: priority.NONE,
+    values: Object.values(Priority),
+    defaultValue: Priority.NONE,
   },
 });
 
@@ -19,7 +19,7 @@ export interface TaskType {
   title: string;
   content?: string;
   deadline?: Date;
-  priority: priority;
+  priority: Priority;
 }
 
 const maxTitleSize = 50;
@@ -54,7 +54,7 @@ export function validateTask(task: TaskType): boolean {
   if (typeof task.priority !== 'undefined') {
     if (
       typeof task.priority !== 'string' ||
-      !Object.values(priority).includes(task.priority)
+      !Object.values(Priority).includes(task.priority)
     ) {
       return false;
     }
