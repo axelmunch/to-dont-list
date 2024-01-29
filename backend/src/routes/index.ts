@@ -1,6 +1,7 @@
 import type { RouteOptions, HTTPMethods } from 'fastify';
 import tagRoutes from './tagRoutes.js';
 import taskRoutes from './taskRoutes.js';
+import taskTagRoutes from './taskTagRoutes.js';
 
 const routes: RouteOptions[] = [
   {
@@ -12,6 +13,7 @@ const routes: RouteOptions[] = [
   },
   ...tagRoutes,
   ...taskRoutes,
+  ...taskTagRoutes,
 ];
 
 export default routes;
