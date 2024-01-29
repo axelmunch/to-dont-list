@@ -1,0 +1,22 @@
+.task {
+  margin: 1rem;
+  padding: 1rem;
+  background-color: #444;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.taskCheckbox {
+  margin: 0.5rem;
+  padding: 1rem;
+  background-color: #222;
+  border-radius: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.taskText {
+  width: 100%;
+}
