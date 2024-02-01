@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import styles from './TaskList.module.css';
-import TaskType from '@/types/TaskType';
 import TaskItem from './TaskItem/TaskItem';
+import { useSync } from '@/data/useSync';
 
 export default function TaskList() {
-  const [tasks, _setTasks] = useState<TaskType[]>([]);
+  const { tasks } = useSync();
 
   return (
     <>
