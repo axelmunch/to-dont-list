@@ -1,7 +1,11 @@
+import SyncStatus from './SyncType';
+
 interface EntityTypes {
   id: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
+
+  syncStatus?: SyncStatus;
 }
 
 export default EntityTypes;

@@ -56,13 +56,6 @@ class LocalDatabaseService<T> {
         const request = objectStore.getAll();
 
         request.onsuccess = () => {
-          // Sort by creation date
-          request.result.sort((a, b) =>
-            new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime()
-              ? 1
-              : -1
-          );
-
           resolve(request.result);
         };
 
