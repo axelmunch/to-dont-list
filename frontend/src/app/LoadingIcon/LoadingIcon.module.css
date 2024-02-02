@@ -1,0 +1,28 @@
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.loader {
+  --loader-size: 5px;
+
+  width: calc(100% - var(--loader-size) * 2);
+  height: calc(100% - var(--loader-size) * 2);
+
+  border: var(--loader-size) solid transparent;
+  border-top: var(--loader-size) solid;
+  border-radius: 50%;
+
+  animation: rotate var(--animation-speed) linear infinite;
+}

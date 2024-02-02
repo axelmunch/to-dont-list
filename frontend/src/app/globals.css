@@ -1,4 +1,11 @@
+:root {
+  --animation-speed: 0.3s;
+
+  --background-color: rgb(42, 42, 42);
+  --color: rgb(224, 224, 224);
+}
+
 body {
-  background-color: rgb(42, 42, 42);
-  color: rgb(224, 224, 224);
+  background-color: var(--background-color);
+  color: var(--color);
 }
