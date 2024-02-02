@@ -11,6 +11,7 @@ import taskService from './TaskService';
 export interface SyncContextType {
   sync: () => void;
   syncing: boolean;
+  syncError: string | null;
   reset: () => void;
   serverAddress: string;
   setServerAddress: (serverAddress: string) => void;
@@ -40,6 +41,7 @@ export const SyncContextProvider = (
   }, []);
 
   const [syncing, setSyncing] = useState<boolean>(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [serverAddress, setServerAddress] = useSavedState<string>(
     'serverAddress',
     ''
@@ -47,18 +49,28 @@ export const SyncContextProvider = (
 
   const sync: SyncContextType['sync'] = () => {
     setSyncing(true);
+    setSyncError(null);
 
     // Sync
-    superFetch<TagType[]>(`${serverAddress}/tags`).then((data) => {
-      setTags(data);
-    });
+    Promise.all([
+      superFetch<TagType[]>(`${serverAddress}/tags`).then((data) => {
+        setTags(data);
+        return tagService.deleteAll().then(() => tagService.addMultiple(data));
+      }),
 
-    superFetch<TaskType[]>(`${serverAddress}/tasks`).then((data) => {
-      setTasks(data);
-      taskService.deleteAll().then(() => taskService.addMultiple(data));
-    });
-
-    setSyncing(false);
+      superFetch<TaskType[]>(`${serverAddress}/tasks`).then((data) => {
+        setTasks(data);
+        return taskService
+          .deleteAll()
+          .then(() => taskService.addMultiple(data));
+      }),
+    ])
+      .finally(() => {
+        setSyncing(false);
+      })
+      .catch((error) => {
+        setSyncError(error.message);
+      });
   };
 
   const reset: SyncContextType['reset'] = () => {
@@ -74,6 +86,7 @@ export const SyncContextProvider = (
       value={{
         sync,
         syncing,
+        syncError,
         reset,
         serverAddress,
         setServerAddress,
