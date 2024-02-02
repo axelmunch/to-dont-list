@@ -2,7 +2,7 @@ import { TaskTag } from '../models/index.js';
 import type { RouteHandlerMethod, FastifyRequest } from 'fastify';
 
 export const getAll: RouteHandlerMethod = async (_request, _reply) => {
-  return await TaskTag.findAll({ order: [['createdAt', 'ASC']] });
+  return await TaskTag.findAll({ order: [['createdAt', 'DESC']] });
 };
 
 export const getTasks: RouteHandlerMethod = async (

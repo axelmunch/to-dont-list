@@ -3,7 +3,7 @@ import { Tag, type TagType } from '../models/index.js';
 import { validateTag as validate } from '../models/Tag.js';
 
 export const getAll: RouteHandlerMethod = async (_request, _reply) => {
-  return await Tag.findAll({ order: [['createdAt', 'ASC']] });
+  return await Tag.findAll({ order: [['createdAt', 'DESC']] });
 };
 
 export const getOne: RouteHandlerMethod = async (

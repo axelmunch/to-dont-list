@@ -3,7 +3,7 @@ import { Task, type TaskType } from '../models/index.js';
 import { validateTask as validate } from '../models/Task.js';
 
 export const getAll: RouteHandlerMethod = async (_request, _reply) => {
-  return await Task.findAll({ order: [['createdAt', 'ASC']] });
+  return await Task.findAll({ order: [['createdAt', 'DESC']] });
 };
 
 export const getOne: RouteHandlerMethod = async (

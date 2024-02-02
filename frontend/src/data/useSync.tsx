@@ -61,7 +61,7 @@ export const SyncContextProvider = (
       tagsWithDeleted
         .filter((element) => element.syncStatus !== SyncType.DELETED)
         .sort((a, b) =>
-          new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime()
+          new Date(a.createdAt).getTime() < new Date(b.createdAt).getTime()
             ? 1
             : -1
         )
@@ -73,7 +73,7 @@ export const SyncContextProvider = (
       tasksWithDeleted
         .filter((element) => element.syncStatus !== SyncType.DELETED)
         .sort((a, b) =>
-          new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime()
+          new Date(a.createdAt).getTime() < new Date(b.createdAt).getTime()
             ? 1
             : -1
         )
