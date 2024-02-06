@@ -1,7 +1,10 @@
 import styles from './TaskItem.module.css';
 import TaskType from '@/types/TaskType';
+import { useSync } from '@/data/useSync';
 
 export default function TaskItem(task: TaskType) {
+  const { update_task } = useSync();
+
   return (
     <div className={styles.task}>
       <div className={styles.taskCheckbox}>
@@ -9,7 +12,9 @@ export default function TaskItem(task: TaskType) {
           type='checkbox'
           className={styles.checkbox}
           checked={task.done}
-          onChange={() => {}}
+          onChange={() => {
+            update_task({ ...task, done: !task.done });
+          }}
         />
       </div>
       <div className={styles.taskText}>

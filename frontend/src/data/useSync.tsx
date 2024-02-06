@@ -1,14 +1,13 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import superFetch from '@/utils/superFetch';
+import superFetch, { HttpMethods } from '@/utils/superFetch';
 import TaskType from '@/types/TaskType';
 import TagType from '@/types/TagType';
 import useSavedState from '@/utils/useSavedState';
 import tagService from './TagService';
 import taskService from './TaskService';
 import SyncType from '@/types/SyncType';
-import EntityTypes from '@/types/EntityTypes';
 
 export interface SyncContextType {
   sync: () => void;
@@ -87,15 +86,10 @@ export const SyncContextProvider = (
     ''
   );
 
-  const get_id = (list: EntityTypes[]): number => {
-    let maxId = 0;
-    list.forEach((element) => {
-      if (Math.abs(element.id) > maxId) {
-        maxId = Math.abs(element.id);
-      }
-    });
+  const get_id = (): number => {
+    const date = new Date();
 
-    return -(maxId + 1);
+    return -date.getTime() * 1000 + date.getMilliseconds();
   };
 
   const create_tag: SyncContextType['create_tag'] = (tag) => {
@@ -103,7 +97,7 @@ export const SyncContextProvider = (
 
     const newTag: TagType = {
       ...tag,
-      id: get_id(tagsWithDeleted),
+      id: get_id(),
       createdAt: date,
       updatedAt: date,
       syncStatus: SyncType.CREATED,
@@ -133,6 +127,15 @@ export const SyncContextProvider = (
   };
 
   const delete_tag: SyncContextType['delete_tag'] = (tag) => {
+    if (
+      tagsWithDeleted.find((t) => t.id === tag.id)?.syncStatus ===
+      SyncType.CREATED
+    ) {
+      tagService.delete(tag.id);
+      setTagsWithDeleted((prev) => prev.filter((t) => t.id !== tag.id));
+      return;
+    }
+
     const date = new Date().toISOString();
 
     const deletedTag: TagType = {
@@ -153,7 +156,7 @@ export const SyncContextProvider = (
 
     const newTask: TaskType = {
       ...task,
-      id: get_id(tasksWithDeleted),
+      id: get_id(),
       createdAt: date,
       updatedAt: date,
       syncStatus: SyncType.CREATED,
@@ -183,6 +186,15 @@ export const SyncContextProvider = (
   };
 
   const delete_task: SyncContextType['delete_task'] = (task) => {
+    if (
+      tasksWithDeleted.find((t) => t.id === task.id)?.syncStatus ===
+      SyncType.CREATED
+    ) {
+      taskService.delete(task.id);
+      setTasksWithDeleted((prev) => prev.filter((t) => t.id !== task.id));
+      return;
+    }
+
     const date = new Date().toISOString();
 
     const deletedTask: TaskType = {
@@ -202,25 +214,122 @@ export const SyncContextProvider = (
     setSyncing(true);
     setSyncError(null);
 
-    // Sync
+    // Send
     Promise.all([
-      superFetch<TagType[]>(`${serverAddress}/tags`).then((data) => {
-        setTagsWithDeleted(data);
-        return tagService.deleteAll().then(() => tagService.addMultiple(data));
-      }),
+      // Created
+      ...tagsWithDeleted
+        .filter((tag) => tag.syncStatus === SyncType.CREATED)
+        .map((tag) => {
+          return superFetch<TagType>(
+            `${serverAddress}/tags`,
+            HttpMethods.POST,
+            {
+              body: JSON.stringify(tag),
+            }
+          ).then(() => {
+            tagService.update({
+              ...tag,
+              syncStatus: undefined,
+            });
+          });
+        }),
+      ...tasksWithDeleted
+        .filter((task) => task.syncStatus === SyncType.CREATED)
+        .map((task) => {
+          return superFetch<TaskType>(
+            `${serverAddress}/tasks`,
+            HttpMethods.POST,
+            {
+              body: JSON.stringify(task),
+            }
+          ).then(() => {
+            taskService.update({
+              ...task,
+              syncStatus: undefined,
+            });
+          });
+        }),
 
-      superFetch<TaskType[]>(`${serverAddress}/tasks`).then((data) => {
-        setTasksWithDeleted(data);
-        return taskService
-          .deleteAll()
-          .then(() => taskService.addMultiple(data));
-      }),
+      // Updated
+      ...tagsWithDeleted
+        .filter((tag) => tag.syncStatus === SyncType.UPDATED)
+        .map((tag) => {
+          return superFetch<TagType>(
+            `${serverAddress}/tags/${tag.id}`,
+            HttpMethods.PUT,
+            {
+              body: JSON.stringify(tag),
+            }
+          ).then(() => {
+            tagService.update({
+              ...tag,
+              syncStatus: undefined,
+            });
+          });
+        }),
+      ...tasksWithDeleted
+        .filter((task) => task.syncStatus === SyncType.UPDATED)
+        .map((task) => {
+          return superFetch<TaskType>(
+            `${serverAddress}/tasks/${task.id}`,
+            HttpMethods.PUT,
+            {
+              body: JSON.stringify(task),
+            }
+          ).then(() => {
+            taskService.update({
+              ...task,
+              syncStatus: undefined,
+            });
+          });
+        }),
+
+      // Deleted
+      ...tagsWithDeleted
+        .filter((tag) => tag.syncStatus === SyncType.DELETED)
+        .map((tag) => {
+          return superFetch<TagType>(
+            `${serverAddress}/tags/${tag.id}`,
+            HttpMethods.DELETE
+          ).then(() => {
+            tagService.delete(tag.id);
+          });
+        }),
+      ...tasksWithDeleted
+        .filter((task) => task.syncStatus === SyncType.DELETED)
+        .map((task) => {
+          return superFetch<TaskType>(
+            `${serverAddress}/tasks/${task.id}`,
+            HttpMethods.DELETE
+          ).then(() => {
+            taskService.delete(task.id);
+          });
+        }),
     ])
-      .finally(() => {
-        setSyncing(false);
+      .then(() => {
+        // Receive
+        Promise.all([
+          superFetch<TagType[]>(`${serverAddress}/tags`).then((data) => {
+            setTagsWithDeleted(data);
+            return tagService
+              .deleteAll()
+              .then(() => tagService.addMultiple(data));
+          }),
+          superFetch<TaskType[]>(`${serverAddress}/tasks`).then((data) => {
+            setTasksWithDeleted(data);
+            return taskService
+              .deleteAll()
+              .then(() => taskService.addMultiple(data));
+          }),
+        ]).catch((error) => {
+          setSyncError(error.message);
+        });
       })
       .catch((error) => {
         setSyncError(error.message);
+      })
+      .finally(() => {
+        setSyncing(false);
       });
   };
 
